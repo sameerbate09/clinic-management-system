@@ -1,0 +1,23 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace Clinic.Infrastructure.Persistence.Entities;
+
+public partial class Visit
+{
+    public int VisitId { get; set; }
+
+    public int PatientId { get; set; }
+
+    public DateTime VisitDate { get; set; }
+
+    public string Complaint { get; set; } = null!;
+
+    public string? Notes { get; set; }
+
+    public DateOnly? NextFollowUpDate { get; set; }
+
+    public virtual Patient Patient { get; set; } = null!;
+
+    public virtual Prescription? Prescription { get; set; }
+}
