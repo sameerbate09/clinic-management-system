@@ -47,6 +47,8 @@ public partial class ClinicDbContext : DbContext
 
             entity.HasIndex(e => e.Mobile, "IX_Patients_Mobile");
 
+            entity.HasIndex(e => e.PatientGuid, "UQ_Patients_PatientGuid").IsUnique();
+
             entity.HasIndex(e => e.Mobile, "UQ__Patients__6FAE078238AE7ED7").IsUnique();
 
             entity.Property(e => e.Concern).HasMaxLength(50);
@@ -57,11 +59,14 @@ public partial class ClinicDbContext : DbContext
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.Mobile).HasMaxLength(15);
             entity.Property(e => e.Name).HasMaxLength(100);
+            entity.Property(e => e.PatientGuid).HasDefaultValueSql("(newid())");
         });
 
         modelBuilder.Entity<Prescription>(entity =>
         {
             entity.HasKey(e => e.PrescriptionId).HasName("PK__Prescrip__40130832222A1EF2");
+
+            entity.HasIndex(e => e.PrescriptionGuid, "UQ_Prescriptions_PrescriptionGuid").IsUnique();
 
             entity.HasIndex(e => e.VisitId, "UQ_Prescriptions_Visit").IsUnique();
 
@@ -69,8 +74,15 @@ public partial class ClinicDbContext : DbContext
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
             entity.Property(e => e.Notes).HasMaxLength(500);
+            entity.Property(e => e.PrescriptionGuid).HasDefaultValueSql("(newid())");
 
-            entity.HasOne(d => d.Visit).WithOne(p => p.Prescription)
+            entity.HasOne(d => d.Visit).WithMany(p => p.PrescriptionVisits)
+                .HasPrincipalKey(p => p.VisitGuid)
+                .HasForeignKey(d => d.VisitGuid)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Prescriptions_Visits_Guid");
+
+            entity.HasOne(d => d.VisitNavigation).WithOne(p => p.PrescriptionVisitNavigation)
                 .HasForeignKey<Prescription>(d => d.VisitId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Prescriptions_Visits");
@@ -86,7 +98,13 @@ public partial class ClinicDbContext : DbContext
             entity.Property(e => e.Instructions).HasMaxLength(250);
             entity.Property(e => e.MedicineName).HasMaxLength(150);
 
-            entity.HasOne(d => d.Prescription).WithMany(p => p.PrescriptionMedicines)
+            entity.HasOne(d => d.Prescription).WithMany(p => p.PrescriptionMedicinePrescriptions)
+                .HasPrincipalKey(p => p.PrescriptionGuid)
+                .HasForeignKey(d => d.PrescriptionGuid)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PrescriptionMedicines_Prescriptions_Guid");
+
+            entity.HasOne(d => d.PrescriptionNavigation).WithMany(p => p.PrescriptionMedicinePrescriptionNavigations)
                 .HasForeignKey(d => d.PrescriptionId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_PrescriptionMedicines_Prescriptions");
@@ -98,7 +116,13 @@ public partial class ClinicDbContext : DbContext
 
             entity.Property(e => e.Notes).HasMaxLength(500);
 
-            entity.HasOne(d => d.Prescription).WithMany(p => p.PrescriptionTherapies)
+            entity.HasOne(d => d.Prescription).WithMany(p => p.PrescriptionTherapyPrescriptions)
+                .HasPrincipalKey(p => p.PrescriptionGuid)
+                .HasForeignKey(d => d.PrescriptionGuid)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PrescriptionTherapies_Prescriptions_Guid");
+
+            entity.HasOne(d => d.PrescriptionNavigation).WithMany(p => p.PrescriptionTherapyPrescriptionNavigations)
                 .HasForeignKey(d => d.PrescriptionId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_PrescriptionTherapies_Prescriptions");
@@ -125,13 +149,22 @@ public partial class ClinicDbContext : DbContext
 
             entity.HasIndex(e => e.PatientId, "IX_Visits_PatientId");
 
+            entity.HasIndex(e => e.VisitGuid, "UQ_Visits_VisitGuid").IsUnique();
+
             entity.Property(e => e.Complaint).HasMaxLength(500);
             entity.Property(e => e.Notes).HasMaxLength(1000);
             entity.Property(e => e.VisitDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
+            entity.Property(e => e.VisitGuid).HasDefaultValueSql("(newid())");
 
-            entity.HasOne(d => d.Patient).WithMany(p => p.Visits)
+            entity.HasOne(d => d.Patient).WithMany(p => p.VisitPatients)
+                .HasPrincipalKey(p => p.PatientGuid)
+                .HasForeignKey(d => d.PatientGuid)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Visits_Patients_Guid");
+
+            entity.HasOne(d => d.PatientNavigation).WithMany(p => p.VisitPatientNavigations)
                 .HasForeignKey(d => d.PatientId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Visits_Patients");

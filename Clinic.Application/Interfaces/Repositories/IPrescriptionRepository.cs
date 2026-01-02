@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Clinic.Domain.Entities;
 
 namespace Clinic.Application.Interfaces.Repositories
 {
-    internal class IPrescriptionRepository
+    public interface IPrescriptionRepository
     {
+        Task<Prescription> GetByVisitIdAsync(int visitId);
+        Task AddAsync(Prescription prescription);
     }
+
 }

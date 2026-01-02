@@ -9,12 +9,12 @@ namespace Clinic.Domain.Entities;
 public class PrescriptionMedicine
 {
     public int Id { get; private set; }
-    public int PrescriptionId { get; private set; }
+    public Guid PrescriptionId { get; private set; }
     public string MedicineName { get; private set; }
     public string Dosage { get; private set; }
     public int DurationDays { get; private set; }
 
-    public PrescriptionMedicine(int prescriptionId, string medicineName, string dosage, int durationDays)
+    public PrescriptionMedicine(Guid prescriptionId, string medicineName, string dosage, int durationDays)
     {
         PrescriptionId = prescriptionId;
         MedicineName = medicineName;

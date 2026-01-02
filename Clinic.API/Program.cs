@@ -1,4 +1,7 @@
 using Clinic.Infrastructure.Persistence;
+using Clinic.Application.Services;
+using Clinic.Infrastructure.Repositories;
+using Clinic.Application.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +15,10 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ClinicDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Register repositories and services
+builder.Services.AddScoped<IPatientRepository, Clinic.Infrastructure.Repositories.PatientRepository>();
+builder.Services.AddScoped<IPatientService, PatientService>();
 
 var app = builder.Build();
 

@@ -17,7 +17,15 @@ public partial class Visit
 
     public DateOnly? NextFollowUpDate { get; set; }
 
+    public Guid PatientGuid { get; set; }
+
+    public Guid VisitGuid { get; set; }
+
     public virtual Patient Patient { get; set; } = null!;
 
-    public virtual Prescription? Prescription { get; set; }
+    public virtual Patient PatientNavigation { get; set; } = null!;
+
+    public virtual Prescription? PrescriptionVisitNavigation { get; set; }
+
+    public virtual ICollection<Prescription> PrescriptionVisits { get; set; } = new List<Prescription>();
 }

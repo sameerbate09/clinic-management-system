@@ -13,7 +13,11 @@ public partial class PrescriptionTherapy
 
     public string? Notes { get; set; }
 
+    public Guid PrescriptionGuid { get; set; }
+
     public virtual Prescription Prescription { get; set; } = null!;
+
+    public virtual Prescription PrescriptionNavigation { get; set; } = null!;
 
     public virtual Therapy Therapy { get; set; } = null!;
 }

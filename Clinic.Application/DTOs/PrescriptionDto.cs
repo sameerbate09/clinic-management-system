@@ -8,8 +8,8 @@ namespace Clinic.Application.DTOs
 {
     public class CreatePrescriptionRequest
     {
-        public int VisitId { get; set; }
-        public string Advice { get; set; }
+        public Guid VisitId { get; set; }
+        public string Notes { get; set; }
         public List<PrescriptionMedicineDto> Medicines { get; set; }
         public List<PrescriptionTherapyDto> Therapies { get; set; }
     }

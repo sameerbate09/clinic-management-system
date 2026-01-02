@@ -3,10 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Clinic.Domain.Entities;
 
 namespace Clinic.Application.Interfaces.Repositories
 {
-    internal class IVisitRepository
+    public interface IVisitRepository
     {
+        Task<List<Visit>> GetByPatientIdAsync(Guid patientId);
+        Task<Visit> GetByIdAsync(Guid visitId);
+        Task AddAsync(Visit visit);
     }
+
 }

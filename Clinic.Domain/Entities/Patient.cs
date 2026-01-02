@@ -8,16 +8,17 @@ namespace Clinic.Domain.Entities;
 
 public class Patient
 {
-    public int Id { get; private set; }
+    //public int Id { get; private set; }
+    public Guid PatientId { get; set; }
     public string Name { get; private set; }
     public string Mobile { get; private set; }
     public int Age { get; private set; }
     public string Gender { get; private set; }
     public string Concern { get; private set; }
 
-    public Patient(int id, string name, string mobile, int age, string gender, string concern)
+    public Patient(Guid patientId, string name, string mobile, int age, string gender, string concern)
     {
-        Id = id;
+        PatientId = patientId;
         Name = name;
         Mobile = mobile;
         Age = age;

@@ -17,9 +17,13 @@ public partial class Patient
 
     public string? Concern { get; set; }
 
-    public bool IsActive { get; set; }
+    public bool IsActive { get; set; } = true;
 
     public DateTime CreatedDate { get; set; }
 
-    public virtual ICollection<Visit> Visits { get; set; } = new List<Visit>();
+    public Guid PatientGuid { get; set; }
+
+    public virtual ICollection<Visit> VisitPatientNavigations { get; set; } = new List<Visit>();
+
+    public virtual ICollection<Visit> VisitPatients { get; set; } = new List<Visit>();
 }

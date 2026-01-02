@@ -13,9 +13,19 @@ public partial class Prescription
 
     public DateTime CreatedDate { get; set; }
 
-    public virtual ICollection<PrescriptionMedicine> PrescriptionMedicines { get; set; } = new List<PrescriptionMedicine>();
+    public Guid VisitGuid { get; set; }
 
-    public virtual ICollection<PrescriptionTherapy> PrescriptionTherapies { get; set; } = new List<PrescriptionTherapy>();
+    public Guid PrescriptionGuid { get; set; }
+
+    public virtual ICollection<PrescriptionMedicine> PrescriptionMedicinePrescriptionNavigations { get; set; } = new List<PrescriptionMedicine>();
+
+    public virtual ICollection<PrescriptionMedicine> PrescriptionMedicinePrescriptions { get; set; } = new List<PrescriptionMedicine>();
+
+    public virtual ICollection<PrescriptionTherapy> PrescriptionTherapyPrescriptionNavigations { get; set; } = new List<PrescriptionTherapy>();
+
+    public virtual ICollection<PrescriptionTherapy> PrescriptionTherapyPrescriptions { get; set; } = new List<PrescriptionTherapy>();
 
     public virtual Visit Visit { get; set; } = null!;
+
+    public virtual Visit VisitNavigation { get; set; } = null!;
 }
