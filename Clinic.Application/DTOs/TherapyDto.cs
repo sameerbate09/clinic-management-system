@@ -10,11 +10,16 @@ namespace Clinic.Application.DTOs
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public bool IsActive { get; set; }
     }
 
     public class CreateTherapyRequest
     {
         public string Name { get; set; }
+    }
+
+    public class UpdateTherapyRequest
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = null!;
     }
 }

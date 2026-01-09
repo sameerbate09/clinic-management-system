@@ -8,19 +8,22 @@ namespace Clinic.Domain.Entities;
 
 public class Visit
 {
-    //public int Id { get; private set; }
-    //public int PatientId { get; private set; }
     public Guid VisitId { get; set; }
     public Guid PatientId { get; set; }
-    public DateTime VisitDate { get; private set; }
-    public string Notes { get; private set; }
-    public DateTime? NextFollowUpDate { get; private set; }
+    public DateTime VisitDate { get;  set; }
+    public string Notes { get;  set; }
+    public string Complaint { get; set; }
+    public DateOnly? NextFollowUpDate { get;  set; }
 
-    public Visit(Guid patientId, DateTime visitDate, string notes, DateTime? nextFollowUpDate)
+
+    public Visit() { }
+
+    public Visit(Guid patientId, DateTime visitDate, string complaint, string notes, DateOnly? nextFollowUpDate)
     {
         PatientId = patientId;
         VisitDate = visitDate;
         Notes = notes;
+        Complaint = complaint;
         NextFollowUpDate = nextFollowUpDate;
     }
 }

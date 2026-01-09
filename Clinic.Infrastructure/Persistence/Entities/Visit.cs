@@ -7,8 +7,6 @@ public partial class Visit
 {
     public int VisitId { get; set; }
 
-    public int PatientId { get; set; }
-
     public DateTime VisitDate { get; set; }
 
     public string Complaint { get; set; } = null!;
@@ -22,8 +20,6 @@ public partial class Visit
     public Guid VisitGuid { get; set; }
 
     public virtual Patient Patient { get; set; } = null!;
-
-    public virtual Patient PatientNavigation { get; set; } = null!;
 
     public virtual Prescription? PrescriptionVisitNavigation { get; set; }
 

@@ -19,6 +19,13 @@ builder.Services.AddDbContext<ClinicDbContext>(options =>
 // Register repositories and services
 builder.Services.AddScoped<IPatientRepository, Clinic.Infrastructure.Repositories.PatientRepository>();
 builder.Services.AddScoped<IPatientService, PatientService>();
+builder.Services.AddScoped<IVisitService, VisitService>();
+builder.Services.AddScoped<IVisitRepository, Clinic.Infrastructure.Repositories.VisitRepository>();
+builder.Services.AddScoped<ITherapyRepository, Clinic.Infrastructure.Repositories.TherapyRepository>();
+builder.Services.AddScoped<ITherapyService, TherapyService>();
+builder.Services.AddScoped<IMedicineRepository, Clinic.Infrastructure.Repositories.MedicineRepository>();
+builder.Services.AddScoped<IMedicineService, MedicineService>();
+
 
 var app = builder.Build();
 

@@ -14,6 +14,8 @@ public class PrescriptionTherapy
     public int Sessions { get; private set; }        // Number of sessions
     public string? Notes { get; private set; }       // Optional notes for therapy
 
+    private PrescriptionTherapy() { }
+
     internal PrescriptionTherapy(Guid prescriptionId, int therapyId, int sessions, string? notes = null)
     {
         PrescriptionId = prescriptionId;

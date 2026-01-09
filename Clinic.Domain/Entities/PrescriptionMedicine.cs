@@ -14,6 +14,8 @@ public class PrescriptionMedicine
     public string Dosage { get; private set; }
     public int DurationDays { get; private set; }
 
+    private PrescriptionMedicine() { }
+
     public PrescriptionMedicine(Guid prescriptionId, string medicineName, string dosage, int durationDays)
     {
         PrescriptionId = prescriptionId;

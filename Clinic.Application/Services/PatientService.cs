@@ -33,10 +33,6 @@ namespace Clinic.Application.Services
             return await _repository.DeletePatient(id);
         }
 
-        public Task<bool> DeleteAsync(int id)
-        {
-            throw new NotImplementedException();
-        }
 
         public async Task<List<PatientResponse>> GetAllAsync()
         {
@@ -70,9 +66,5 @@ namespace Clinic.Application.Services
             return new PatientResponse { PatientId = updated.PatientId, Name = updated.Name, Mobile = updated.Mobile };
         }
 
-        public Task<PatientResponse?> UpdateAsync(int id, CreatePatientRequest request)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

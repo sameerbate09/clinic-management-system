@@ -1,0 +1,57 @@
+﻿using Clinic.Application.DTOs;
+using Clinic.Application.Services;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Clinic.API.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class TherapyController : ControllerBase
+    {
+        private readonly ITherapyService _service;
+
+        public TherapyController(ITherapyService service)
+        {
+            _service = service;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var list = await _service.GetAllTherapiesAsync();
+            return Ok(list);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddTherapy([FromBody] CreateTherapyRequest request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            var created = await _service.AddTherapyAsync(request);
+            return CreatedAtAction(nameof(GetAll), created);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateTherapy([FromBody] UpdateTherapyRequest request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            await _service.UpdateTherapyAsync(request);
+            return Ok(request);
+        }
+
+        [HttpDelete("{therapyId}")]
+        public async Task<IActionResult> DeleteTherapy(int therapyId)
+        {
+            await _service.DeleteTherapyAsync(therapyId);
+            return Ok("Therapy is softly deleted successfully");
+        }
+
+        [HttpPost("{therapyId}/reactivate")]
+        public async Task<IActionResult> ReactivateTherapy(int therapyId)
+        {
+            await _service.ReactivateTherapyAsync(therapyId);
+            return Ok("Therapy reactivated successfully");
+        }
+    }
+}

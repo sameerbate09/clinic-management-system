@@ -14,6 +14,8 @@ public partial class ClinicDbContext : DbContext
 
     public virtual DbSet<Enquiry> Enquiries { get; set; }
 
+    public virtual DbSet<Medicine> Medicines { get; set; }
+
     public virtual DbSet<Patient> Patients { get; set; }
 
     public virtual DbSet<Prescription> Prescriptions { get; set; }
@@ -41,9 +43,22 @@ public partial class ClinicDbContext : DbContext
             entity.Property(e => e.Name).HasMaxLength(100);
         });
 
+        modelBuilder.Entity<Medicine>(entity =>
+        {
+            entity.HasKey(e => e.MedicineId).HasName("PK__Medicine__4F2128906B0CCED0");
+
+            entity.HasIndex(e => e.MedicineGuid, "UQ_Medicines_MedicineGuid").IsUnique();
+
+            entity.Property(e => e.CreatedDate).HasDefaultValueSql("(sysutcdatetime())");
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
+            entity.Property(e => e.MedicineGuid).HasDefaultValueSql("(newid())");
+            entity.Property(e => e.Name).HasMaxLength(150);
+        });
+
         modelBuilder.Entity<Patient>(entity =>
         {
-            entity.HasKey(e => e.PatientId).HasName("PK__Patients__970EC3664346DA69");
+            entity.HasKey(e => e.PatientGuid).HasName("PK_Patients_PatientGuid");
 
             entity.HasIndex(e => e.Mobile, "IX_Patients_Mobile");
 
@@ -51,6 +66,7 @@ public partial class ClinicDbContext : DbContext
 
             entity.HasIndex(e => e.Mobile, "UQ__Patients__6FAE078238AE7ED7").IsUnique();
 
+            entity.Property(e => e.PatientGuid).HasDefaultValueSql("(newid())");
             entity.Property(e => e.Concern).HasMaxLength(50);
             entity.Property(e => e.CreatedDate)
                 .HasDefaultValueSql("(getdate())")
@@ -59,7 +75,6 @@ public partial class ClinicDbContext : DbContext
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.Mobile).HasMaxLength(15);
             entity.Property(e => e.Name).HasMaxLength(100);
-            entity.Property(e => e.PatientGuid).HasDefaultValueSql("(newid())");
         });
 
         modelBuilder.Entity<Prescription>(entity =>
@@ -97,6 +112,11 @@ public partial class ClinicDbContext : DbContext
             entity.Property(e => e.Frequency).HasMaxLength(50);
             entity.Property(e => e.Instructions).HasMaxLength(250);
             entity.Property(e => e.MedicineName).HasMaxLength(150);
+
+            entity.HasOne(d => d.Medicine).WithMany(p => p.PrescriptionMedicines)
+                .HasForeignKey(d => d.MedicineId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PrescriptionMedicines_Medicines");
 
             entity.HasOne(d => d.Prescription).WithMany(p => p.PrescriptionMedicinePrescriptions)
                 .HasPrincipalKey(p => p.PrescriptionGuid)
@@ -147,8 +167,6 @@ public partial class ClinicDbContext : DbContext
 
             entity.HasIndex(e => e.NextFollowUpDate, "IX_Visits_FollowUpDate");
 
-            entity.HasIndex(e => e.PatientId, "IX_Visits_PatientId");
-
             entity.HasIndex(e => e.VisitGuid, "UQ_Visits_VisitGuid").IsUnique();
 
             entity.Property(e => e.Complaint).HasMaxLength(500);
@@ -158,16 +176,10 @@ public partial class ClinicDbContext : DbContext
                 .HasColumnType("datetime");
             entity.Property(e => e.VisitGuid).HasDefaultValueSql("(newid())");
 
-            entity.HasOne(d => d.Patient).WithMany(p => p.VisitPatients)
-                .HasPrincipalKey(p => p.PatientGuid)
+            entity.HasOne(d => d.Patient).WithMany(p => p.Visits)
                 .HasForeignKey(d => d.PatientGuid)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Visits_Patients_Guid");
-
-            entity.HasOne(d => d.PatientNavigation).WithMany(p => p.VisitPatientNavigations)
-                .HasForeignKey(d => d.PatientId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Visits_Patients");
         });
 
         OnModelCreatingPartial(modelBuilder);

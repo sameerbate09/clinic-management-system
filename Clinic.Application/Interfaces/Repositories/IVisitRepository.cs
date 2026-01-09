@@ -9,9 +9,9 @@ namespace Clinic.Application.Interfaces.Repositories
 {
     public interface IVisitRepository
     {
-        Task<List<Visit>> GetByPatientIdAsync(Guid patientId);
+        Task<IEnumerable<Visit>> GetByPatientIdAsync(Guid patientId);
         Task<Visit> GetByIdAsync(Guid visitId);
-        Task AddAsync(Visit visit);
+        Task<Guid> AddAsync(Visit visit);
     }
 
 }
