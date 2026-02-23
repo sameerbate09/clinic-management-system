@@ -13,8 +13,6 @@ public partial class Visit
 
     public string? Notes { get; set; }
 
-    public DateOnly? NextFollowUpDate { get; set; }
-
     public Guid PatientGuid { get; set; }
 
     public Guid VisitGuid { get; set; }

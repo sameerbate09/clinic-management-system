@@ -9,7 +9,7 @@ public partial class Therapy
 
     public string TherapyName { get; set; } = null!;
 
-    public bool IsActive { get; set; } = true;
+    public bool IsActive { get; set; }
 
     public virtual ICollection<PrescriptionTherapy> PrescriptionTherapies { get; set; } = new List<PrescriptionTherapy>();
 }

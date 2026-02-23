@@ -27,8 +27,8 @@ namespace Clinic.Infrastructure.Repositories
             // Map domain Medicine to persistence entity
             var entity = new infraEntity
             {
-                 Name = medicine.Name,
-                 Description = medicine.Description,
+                Name = medicine.Name,
+                Description = medicine.Description,
                 // IsActive configured with defaults in the DbContext model;
             };
             await _context.Medicines.AddAsync(entity);
@@ -42,7 +42,7 @@ namespace Clinic.Infrastructure.Repositories
 
             var entity = await _context.Medicines.FirstOrDefaultAsync(m => m.MedicineGuid == medicineId);
             if (entity == null)
-                return false; 
+                return false;
 
             // Soft-delete: mark inactive
             entity.IsActive = false;
@@ -70,10 +70,9 @@ namespace Clinic.Infrastructure.Repositories
             if (medicine == null)
                 throw new ArgumentNullException(nameof(medicine));
 
-            var entity = await _context.Medicines.FirstOrDefaultAsync(m => m.MedicineGuid == medicine.MedicineGuid);
-
-            if (entity == null)
-                throw new ArgumentNullException(nameof(entity));
+            var entity = await _context.Medicines
+        .SingleOrDefaultAsync(m => m.MedicineGuid == medicine.MedicineGuid)
+        ?? throw new InvalidOperationException("Medicine not found");
 
             // Update entity properties
             entity.Name = medicine.Name;

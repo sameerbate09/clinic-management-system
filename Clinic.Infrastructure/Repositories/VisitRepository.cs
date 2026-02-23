@@ -34,8 +34,7 @@ namespace Clinic.Infrastructure.Repositories
                 PatientGuid = visit.PatientId,
                 VisitDate = DateTime.UtcNow,
                 Complaint = visit.Complaint,
-                Notes = visit.Notes,
-                NextFollowUpDate = visit.NextFollowUpDate
+                Notes = visit.Notes
             };
 
             await _context.Visits.AddAsync(entity);
@@ -58,8 +57,7 @@ namespace Clinic.Infrastructure.Repositories
                 PatientId = v.PatientGuid,
                 VisitDate = v.VisitDate,
                 Complaint = v.Complaint,
-                Notes = v.Notes,
-                NextFollowUpDate = v.NextFollowUpDate
+                Notes = v.Notes
             };
         }
 
@@ -74,8 +72,7 @@ namespace Clinic.Infrastructure.Repositories
                 PatientId = v.PatientGuid,
                 VisitDate = v.VisitDate,
                 Complaint = v.Complaint,
-                Notes = v.Notes,
-                NextFollowUpDate = v.NextFollowUpDate
+                Notes = v.Notes
             })
             .ToListAsync();
         }

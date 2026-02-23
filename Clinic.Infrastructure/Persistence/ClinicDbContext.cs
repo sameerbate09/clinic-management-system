@@ -88,6 +88,8 @@ public partial class ClinicDbContext : DbContext
             entity.Property(e => e.CreatedDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
+            entity.Property(e => e.FinalizedAt).HasColumnType("datetime");
+            entity.Property(e => e.NextFollowUpDate).HasColumnType("datetime");
             entity.Property(e => e.Notes).HasMaxLength(500);
             entity.Property(e => e.PrescriptionGuid).HasDefaultValueSql("(newid())");
 
@@ -164,8 +166,6 @@ public partial class ClinicDbContext : DbContext
         modelBuilder.Entity<Visit>(entity =>
         {
             entity.HasKey(e => e.VisitId).HasName("PK__Visits__4D3AA1DE7F3FBDFE");
-
-            entity.HasIndex(e => e.NextFollowUpDate, "IX_Visits_FollowUpDate");
 
             entity.HasIndex(e => e.VisitGuid, "UQ_Visits_VisitGuid").IsUnique();
 

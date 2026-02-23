@@ -17,6 +17,12 @@ public partial class Prescription
 
     public Guid PrescriptionGuid { get; set; }
 
+    public DateTime? NextFollowUpDate { get; set; }
+
+    public bool IsFinalized { get; set; }
+
+    public DateTime? FinalizedAt { get; set; }
+
     public virtual ICollection<PrescriptionMedicine> PrescriptionMedicinePrescriptionNavigations { get; set; } = new List<PrescriptionMedicine>();
 
     public virtual ICollection<PrescriptionMedicine> PrescriptionMedicinePrescriptions { get; set; } = new List<PrescriptionMedicine>();
