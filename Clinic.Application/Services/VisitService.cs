@@ -23,8 +23,7 @@ namespace Clinic.Application.Services
            dto.PatientId,
            DateTime.UtcNow,
            dto.Complaint,
-           dto.Notes,
-           dto.NextFollowUpDate
+           dto.Notes
        );
 
             return await _visitRepository.AddAsync(visit);
@@ -40,8 +39,7 @@ namespace Clinic.Application.Services
                 VisitId = visit.VisitId,
                 VisitDate = visit.VisitDate,
                 Complaint = visit.Complaint,
-                Notes = visit.Notes,
-                NextFollowUpDate = visit.NextFollowUpDate
+                Notes = visit.Notes
             };
         }
 
@@ -52,8 +50,7 @@ namespace Clinic.Application.Services
             return visits.Select(v => new VisitSummaryDto
             {
                 VisitId = v.VisitId,
-                VisitDate = v.VisitDate,
-                NextFollowUpDate = v.NextFollowUpDate
+                VisitDate = v.VisitDate
             });
         }
     }

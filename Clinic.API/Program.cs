@@ -25,6 +25,8 @@ builder.Services.AddScoped<ITherapyRepository, Clinic.Infrastructure.Repositorie
 builder.Services.AddScoped<ITherapyService, TherapyService>();
 builder.Services.AddScoped<IMedicineRepository, Clinic.Infrastructure.Repositories.MedicineRepository>();
 builder.Services.AddScoped<IMedicineService, MedicineService>();
+builder.Services.AddScoped<IPrescriptionRepository, PrescriptionRepository>();
+builder.Services.AddScoped<IPrescriptionService, PrescriptionService>();
 
 
 var app = builder.Build();

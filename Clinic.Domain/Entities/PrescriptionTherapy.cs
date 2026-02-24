@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Clinic.Domain.Entities;
+﻿namespace Clinic.Domain.Entities;
 
 public class PrescriptionTherapy
 {
@@ -16,11 +10,10 @@ public class PrescriptionTherapy
 
     private PrescriptionTherapy() { }
 
-    internal PrescriptionTherapy(Guid prescriptionId, int therapyId, int sessions, string? notes = null)
+    public PrescriptionTherapy(Guid prescriptionId, int therapyId, string? notes = null)
     {
         PrescriptionId = prescriptionId;
         TherapyId = therapyId;
-        Sessions = sessions;
         Notes = notes;
     }
 }

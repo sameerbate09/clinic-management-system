@@ -11,7 +11,6 @@ namespace Clinic.Application.DTOs
         public Guid PatientId { get; set; }
         public string Complaint { get; set; }
         public string Notes { get; set; }
-        public DateOnly? NextFollowUpDate { get; set; }
     }
 
     public class VisitResponseDto
@@ -20,14 +19,12 @@ namespace Clinic.Application.DTOs
         public DateTime VisitDate { get; set; }
         public string Complaint { get; set; }
         public string Notes { get; set; }
-        public DateOnly? NextFollowUpDate { get; set; }
     }
 
     public class VisitSummaryDto
     {
         public Guid VisitId { get; set; }
         public DateTime VisitDate { get; set; }
-        public DateOnly? NextFollowUpDate { get; set; }
         public string Complaint { get; set; }
     }
 

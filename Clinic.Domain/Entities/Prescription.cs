@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Clinic.Domain.Entities;
+﻿namespace Clinic.Domain.Entities;
 
 public class Prescription
 {
@@ -72,8 +66,12 @@ public class Prescription
 
     private void EnsureEditable()
     {
-        if (IsFinalized)
+        if (IsFinalized ||
+            (NextFollowUpDate.HasValue &&
+             NextFollowUpDate.Value < DateTime.UtcNow))
+        {
             throw new InvalidOperationException(
-                "Prescription is finalized and cannot be modified.");
+                "Prescription is finalized or expired.");
+        }
     }
 }
