@@ -15,6 +15,8 @@ public partial class PrescriptionTherapy
 
     public Guid PrescriptionGuid { get; set; }
 
+    public int? Sessions { get; set; }
+
     public virtual Prescription Prescription { get; set; } = null!;
 
     public virtual Prescription PrescriptionNavigation { get; set; } = null!;

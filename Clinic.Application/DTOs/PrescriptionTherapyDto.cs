@@ -6,5 +6,4 @@
         public int Sessions { get; set; }
         public string? Notes { get; set; }
     }
-
 }

@@ -41,7 +41,8 @@ namespace Clinic.Application.Services
                     .Select(t => new PrescriptionTherapyDto
                     {
                         TherapyId = t.TherapyId,
-                        Sessions = t.Sessions
+                        Sessions = t.Sessions,
+                        Notes = t.Notes
                     }).ToList()
             };
         }
@@ -72,6 +73,7 @@ namespace Clinic.Application.Services
                     new PrescriptionTherapy(
                         prescription.PrescriptionId,
                         therapy.TherapyId,
+                        therapy.Sessions,
                         therapy.Notes));
             }
 
@@ -105,7 +107,8 @@ namespace Clinic.Application.Services
                     .Select(t => new PrescriptionTherapyDto
                     {
                         TherapyId = t.TherapyId,
-                        Sessions = t.Sessions
+                        Sessions = t.Sessions,
+                        Notes = t.Notes
                     }).ToList()
             };
         }

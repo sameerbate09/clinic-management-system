@@ -10,10 +10,11 @@ public class PrescriptionTherapy
 
     private PrescriptionTherapy() { }
 
-    public PrescriptionTherapy(Guid prescriptionId, int therapyId, string? notes = null)
+    public PrescriptionTherapy(Guid prescriptionId, int therapyId, int sessions = 0, string? notes = null)
     {
         PrescriptionId = prescriptionId;
         TherapyId = therapyId;
+        Sessions = sessions;
         Notes = notes;
     }
 }

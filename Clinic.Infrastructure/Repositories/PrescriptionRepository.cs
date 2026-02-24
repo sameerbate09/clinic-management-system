@@ -93,7 +93,8 @@ namespace Clinic.Infrastructure.Repositories
                     PrescriptionId = entity.PrescriptionId,
                     PrescriptionGuid = entity.PrescriptionGuid,
                     TherapyId = therapy.TherapyId,
-                    Notes = therapy.Notes
+                    Notes = therapy.Notes,
+                    Sessions = therapy.Sessions
                 });
             }
 
@@ -164,12 +165,19 @@ namespace Clinic.Infrastructure.Repositories
         private Prescription MapToDomain(Infrastructure.Persistence.Entities.Prescription entity)
         {
             var domain = new Prescription(
+                entity.PrescriptionGuid,
                 entity.VisitGuid,
                 entity.Notes,
-                entity.NextFollowUpDate);
+                entity.NextFollowUpDate,
+                entity.CreatedDate,
+                entity.IsFinalized,
+                entity.FinalizedAt);
 
             foreach (var med in entity.PrescriptionMedicinePrescriptions)
             {
+                // When mapping from persistence we must not run the editability checks which are intended
+                // to prevent modifications on finalized/expired prescriptions. Allow adding medicines and
+                // therapies to the domain object without those checks so GET operations don't throw.
                 domain.AddMedicine(new PrescriptionMedicine(
                     domain.PrescriptionId,
                     med.MedicineId, 
@@ -177,7 +185,8 @@ namespace Clinic.Infrastructure.Repositories
                     med.Dosage,
                     med.Frequency,
                     med.Instructions,
-                    med.Duration));
+                    med.Duration),
+                    skipCheck: true);
             }
 
             foreach (var therapy in entity.PrescriptionTherapyPrescriptions)
@@ -185,7 +194,9 @@ namespace Clinic.Infrastructure.Repositories
                 domain.AddTherapy(new PrescriptionTherapy(
                     domain.PrescriptionId,
                     therapy.TherapyId,
-                    therapy.Notes));
+                    therapy.Sessions.GetValueOrDefault(),
+                    therapy.Notes),
+                    skipCheck: true);
             }
 
             if (entity.IsFinalized)
