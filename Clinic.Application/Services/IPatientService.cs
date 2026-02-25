@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Clinic.Application.DTOs;
 
 namespace Clinic.Application.Services

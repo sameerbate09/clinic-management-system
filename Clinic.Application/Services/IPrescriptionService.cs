@@ -12,7 +12,7 @@ namespace Clinic.Application.Services
         Task<Guid> CreateAsync(CreatePrescriptionRequest request);
         Task<PrescriptionResponseDto?> GetAsync(Guid prescriptionGuid);
         Task<PrescriptionResponseDto?> GetByVisitGuidAsync(Guid visitGuid);
-        Task UpdateNotesAsync(Guid prescriptionGuid, string? notes);
+        Task UpdateAsync(Guid prescriptionGuid, UpdatePrescriptionRequest request);
         Task AutoFinalizeExpiredAsync();
     }
 }

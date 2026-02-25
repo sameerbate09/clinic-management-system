@@ -122,6 +122,51 @@ namespace Clinic.Application.Services
             await _repository.UpdateAsync(prescription);
         }
 
+        public async Task UpdateAsync(Guid prescriptionGuid, UpdatePrescriptionRequest request)
+        {
+            var prescription = await _repository.GetByGuidAsync(prescriptionGuid);
+            if (prescription == null) return;
+
+            // Update top-level fields
+            prescription.UpdateNotes(request.Notes);
+
+            // Clear and re-add medicines/therapies using domain methods
+            // Create a new prescription domain object based on existing so we can replace collections
+            var updated = new Prescription(
+                prescription.PrescriptionId,
+                prescription.VisitId,
+                request.Notes,
+                request.NextFollowUpDate,
+                prescription.CreatedDate,
+                prescription.IsFinalized,
+                prescription.FinalizedAt);
+
+            foreach (var med in request.Medicines ?? new List<PrescriptionMedicineDto>())
+            {
+                updated.AddMedicine(new PrescriptionMedicine(
+                    updated.PrescriptionId,
+                    med.MedicineId,
+                    med.MedicineName,
+                    med.Dosage,
+                    med.Frequency,
+                    med.Instructions,
+                    med.DurationDays),
+                    skipCheck: true);
+            }
+
+            foreach (var therapy in request.Therapies ?? new List<PrescriptionTherapyDto>())
+            {
+                updated.AddTherapy(new PrescriptionTherapy(
+                    updated.PrescriptionId,
+                    therapy.TherapyId,
+                    therapy.Sessions,
+                    therapy.Notes),
+                    skipCheck: true);
+            }
+
+            await _repository.UpdateAsync(updated);
+        }
+
         public Task AutoFinalizeExpiredAsync()
             => _repository.AutoFinalizeExpiredAsync();
     }

@@ -8,6 +8,13 @@
         public List<PrescriptionMedicineDto> Medicines { get; set; }
         public List<PrescriptionTherapyDto> Therapies { get; set; }
     }
+    public class UpdatePrescriptionRequest
+    {
+        public string Notes { get; set; }
+        public DateTime? NextFollowUpDate { get; set; }
+        public List<PrescriptionMedicineDto> Medicines { get; set; }
+        public List<PrescriptionTherapyDto> Therapies { get; set; }
+    }
     public class PrescriptionResponseDto
     {
         public Guid PrescriptionId { get; set; }

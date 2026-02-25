@@ -40,10 +40,10 @@ namespace Clinic.API.Controllers
             return Ok(result);
         }
 
-        [HttpPut("{guid}/notes")]
-        public async Task<IActionResult> UpdateNotes(Guid guid, [FromBody] string notes)
+        [HttpPut("{guid}")]
+        public async Task<IActionResult> UpdatePrescription(Guid guid, [FromBody] UpdatePrescriptionRequest request)
         {
-            await _service.UpdateNotesAsync(guid, notes);
+            await _service.UpdateAsync(guid, request);
             return NoContent();
         }
 

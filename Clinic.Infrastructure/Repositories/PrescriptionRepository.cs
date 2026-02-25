@@ -140,6 +140,75 @@ namespace Clinic.Infrastructure.Repositories
             entity.FinalizedAt = domain.FinalizedAt;
             entity.NextFollowUpDate = domain.NextFollowUpDate;
 
+            // Update medicines: remove existing and re-add from domain
+            var existingMeds = entity.PrescriptionMedicinePrescriptions.ToList();
+            if (existingMeds.Any())
+            {
+                _context.PrescriptionMedicines.RemoveRange(existingMeds);
+            }
+
+            foreach (var med in domain.Medicines)
+            {
+                Infrastructure.Persistence.Entities.Medicine? medicineEntity = null;
+
+                if (med.MedicineId > 0)
+                {
+                    medicineEntity = await _context.Medicines.FindAsync(med.MedicineId);
+                    if (medicineEntity == null)
+                        throw new InvalidOperationException($"Medicine with id {med.MedicineId} not found.");
+                }
+                else
+                {
+                    medicineEntity = await _context.Medicines.FirstOrDefaultAsync(m => m.Name == med.MedicineName);
+                    if (medicineEntity == null)
+                    {
+                        medicineEntity = new Infrastructure.Persistence.Entities.Medicine
+                        {
+                            MedicineGuid = Guid.NewGuid(),
+                            Name = med.MedicineName
+                        };
+
+                        await _context.Medicines.AddAsync(medicineEntity);
+                        await _context.SaveChangesAsync();
+                    }
+                }
+
+                _context.PrescriptionMedicines.Add(new Infrastructure.Persistence.Entities.PrescriptionMedicine
+                {
+                    PrescriptionId = entity.PrescriptionId,
+                    PrescriptionGuid = entity.PrescriptionGuid,
+                    MedicineId = medicineEntity.MedicineId,
+                    MedicineName = medicineEntity.Name,
+                    Dosage = med.Dosage,
+                    Frequency = med.Frequency,
+                    Instructions = med.Instructions,
+                    Duration = med.DurationDays
+                });
+            }
+
+            // Update therapies: remove existing and re-add from domain
+            var existingTherapies = entity.PrescriptionTherapyPrescriptions.ToList();
+            if (existingTherapies.Any())
+            {
+                _context.PrescriptionTherapies.RemoveRange(existingTherapies);
+            }
+
+            foreach (var therapy in domain.Therapies)
+            {
+                var therapyEntity = await _context.Therapies.FirstOrDefaultAsync(t => t.TherapyId == therapy.TherapyId);
+                if (therapyEntity == null)
+                    throw new InvalidOperationException($"Therapy with id {therapy.TherapyId} not found.");
+
+                _context.PrescriptionTherapies.Add(new Infrastructure.Persistence.Entities.PrescriptionTherapy
+                {
+                    PrescriptionId = entity.PrescriptionId,
+                    PrescriptionGuid = entity.PrescriptionGuid,
+                    TherapyId = therapy.TherapyId,
+                    Notes = therapy.Notes,
+                    Sessions = therapy.Sessions
+                });
+            }
+
             await _context.SaveChangesAsync();
         }
 
