@@ -1,8 +1,10 @@
 using Clinic.Application.DTOs;
 using Clinic.Application.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Clinic.API.Controllers;
+
 
 [ApiController]
 [Route("api/[controller]")]
@@ -15,6 +17,7 @@ public class PatientController : ControllerBase
         _service = service;
     }
 
+    //[Authorize]
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {

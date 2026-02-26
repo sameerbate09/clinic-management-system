@@ -1,4 +1,7 @@
-﻿namespace Clinic.Infrastructure.Persistence.Entities;
+﻿using System;
+using System.Collections.Generic;
+
+namespace Clinic.Infrastructure.Persistence.Entities;
 
 public partial class PrescriptionTherapy
 {

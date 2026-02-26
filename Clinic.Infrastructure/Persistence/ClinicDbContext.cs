@@ -1,4 +1,6 @@
-﻿using Clinic.Infrastructure.Persistence.Entities;
+﻿using System;
+using System.Collections.Generic;
+using Clinic.Infrastructure.Persistence.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Clinic.Infrastructure.Persistence;
@@ -9,6 +11,8 @@ public partial class ClinicDbContext : DbContext
         : base(options)
     {
     }
+
+    public virtual DbSet<Admin> Admins { get; set; }
 
     public virtual DbSet<Enquiry> Enquiries { get; set; }
 
@@ -28,6 +32,16 @@ public partial class ClinicDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Admin>(entity =>
+        {
+            entity.HasKey(e => e.AdminId).HasName("PK__Admins__719FE488A53CB03A");
+
+            entity.HasIndex(e => e.Username, "UQ__Admins__536C85E4C0F8A431").IsUnique();
+
+            entity.Property(e => e.PasswordHash).HasMaxLength(500);
+            entity.Property(e => e.Username).HasMaxLength(100);
+        });
+
         modelBuilder.Entity<Enquiry>(entity =>
         {
             entity.HasKey(e => e.EnquiryId).HasName("PK__Enquirie__0A019B7D3D733AED");
