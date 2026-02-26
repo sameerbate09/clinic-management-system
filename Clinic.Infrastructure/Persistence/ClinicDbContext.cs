@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Clinic.Infrastructure.Persistence.Entities;
+﻿using Clinic.Infrastructure.Persistence.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Clinic.Infrastructure.Persistence;

@@ -1,129 +1,123 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Clinic.Application.Interfaces.Repositories;
+﻿using Clinic.Application.Interfaces.Repositories;
 using Clinic.Domain.Entities;
 using Clinic.Infrastructure.Persistence;
-using InfraEntity = Clinic.Infrastructure.Persistence.Entities.Patient;
 using Microsoft.EntityFrameworkCore;
+using InfraEntity = Clinic.Infrastructure.Persistence.Entities.Patient;
 
-namespace Clinic.Infrastructure.Repositories
+namespace Clinic.Infrastructure.Repositories;
+
+public class PatientRepository : IPatientRepository
 {
-    public class PatientRepository : IPatientRepository
+    private readonly ClinicDbContext _context;
+
+    public PatientRepository(ClinicDbContext context)
     {
-        private readonly ClinicDbContext _context;
+        _context = context ?? throw new ArgumentNullException(nameof(context));
+    }
 
-        public PatientRepository(ClinicDbContext context)
+    public async Task AddAsync(Patient patient)
+    {
+        if (patient is null)
+            throw new ArgumentNullException(nameof(patient), "Patient cannot be null");
+
+        // Map domain Patient to persistence entity
+        var entity = new InfraEntity
         {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
-        }
+            Name = patient.Name,
+            Mobile = patient.Mobile,
+            Age = patient.Age,
+            Gender = patient.Gender,
+            Concern = patient.Concern,
+            // IsActive and CreatedDate are configured with defaults in the DbContext model;
+            // leave them unset so the database defaults are applied.
+        };
 
-        public async Task AddAsync(Patient patient)
-        {
-            if (patient is null)
-                throw new ArgumentNullException(nameof(patient), "Patient cannot be null");
+        await _context.Patients.AddAsync(entity);
+        await _context.SaveChangesAsync();
 
-            // Map domain Patient to persistence entity
-            var entity = new InfraEntity
-            {
-                Name = patient.Name,
-                Mobile = patient.Mobile,
-                Age = patient.Age,
-                Gender = patient.Gender,
-                Concern = patient.Concern,
-                // IsActive and CreatedDate are configured with defaults in the DbContext model;
-                // leave them unset so the database defaults are applied.
-            };
+        // Domain Patient has private setters; repository currently does not return the created domain object.
+    }
 
-            await _context.Patients.AddAsync(entity);
-            await _context.SaveChangesAsync();
+    public async Task<bool> DeletePatient(Guid patientId)
+    {
+        var entity = await _context.Patients.FirstOrDefaultAsync(p => p.PatientGuid == patientId);
+        if (entity == null)
+            return false;
 
-            // Domain Patient has private setters; repository currently does not return the created domain object.
-        }
+        // Soft-delete: mark inactive
+        entity.IsActive = false;
+        _context.Patients.Update(entity);
+        await _context.SaveChangesAsync();
+        return true; 
+    }
 
-        public async Task<bool> DeletePatient(Guid patientId)
-        {
-            var entity = await _context.Patients.FirstOrDefaultAsync(p => p.PatientGuid == patientId);
-            if (entity == null)
-                return false;
+    public async Task<List<Patient>> GetAllPatients()
+    {
+        var list = await _context.Patients
+            .Where(p => p.IsActive)
+            .AsNoTracking()
+            .ToListAsync();
 
-            // Soft-delete: mark inactive
-            entity.IsActive = false;
-            _context.Patients.Update(entity);
-            await _context.SaveChangesAsync();
-            return true; 
-        }
+        return list.Select(MapToDomain).ToList();
+    }
 
-        public async Task<List<Patient>> GetAllPatients()
-        {
-            var list = await _context.Patients
-                .Where(p => p.IsActive)
-                .AsNoTracking()
-                .ToListAsync();
+    public async Task<Patient> GetByIdAsync(Guid patientId)
+    {
+        var entity = await _context.Patients
+            .AsNoTracking()
+            .FirstOrDefaultAsync(p => p.PatientGuid == patientId && p.IsActive);
 
-            return list.Select(MapToDomain).ToList();
-        }
+        if (entity == null)
+            return null!; // caller should handle null (interface expects Task<Patient>)
 
-        public async Task<Patient> GetByIdAsync(Guid patientId)
-        {
-            var entity = await _context.Patients
-                .AsNoTracking()
-                .FirstOrDefaultAsync(p => p.PatientGuid == patientId && p.IsActive);
+        return MapToDomain(entity);
+    }
 
-            if (entity == null)
-                return null!; // caller should handle null (interface expects Task<Patient>)
+    public async Task<Patient> GetByMobileAsync(string mobile)
+    {
+        if (string.IsNullOrWhiteSpace(mobile))
+            throw new ArgumentException("Mobile cannot be null or empty", nameof(mobile));
 
-            return MapToDomain(entity);
-        }
+        // Normalize input to avoid leading/trailing space mismatches
+        var normalizedMobile = mobile.Trim();
 
-        public async Task<Patient> GetByMobileAsync(string mobile)
-        {
-            if (string.IsNullOrWhiteSpace(mobile))
-                throw new ArgumentException("Mobile cannot be null or empty", nameof(mobile));
+        var entity = await _context.Patients
+            .AsNoTracking()
+            .FirstOrDefaultAsync(p => p.Mobile == normalizedMobile && p.IsActive);
 
-            // Normalize input to avoid leading/trailing space mismatches
-            var normalizedMobile = mobile.Trim();
+        if (entity == null)
+            return null!;
 
-            var entity = await _context.Patients
-                .AsNoTracking()
-                .FirstOrDefaultAsync(p => p.Mobile == normalizedMobile && p.IsActive);
+        return MapToDomain(entity);
+    }
 
-            if (entity == null)
-                return null!;
+    public async Task<Patient> UpdatePatient(Patient patient)
+    {
+        if (patient == null) throw new ArgumentNullException(nameof(patient));
 
-            return MapToDomain(entity);
-        }
+        var entity = await _context.Patients.FirstOrDefaultAsync(p => p.PatientGuid == patient.PatientId && p.IsActive);
+        if (entity == null) return null!;
 
-        public async Task<Patient> UpdatePatient(Patient patient)
-        {
-            if (patient == null) throw new ArgumentNullException(nameof(patient));
+        // Apply updates from domain patient to persistence entity
+        entity.Name = patient.Name;
+        entity.Mobile = patient.Mobile;
+        entity.Age = patient.Age;
+        entity.Gender = patient.Gender;
+        entity.Concern = patient.Concern;
 
-            var entity = await _context.Patients.FirstOrDefaultAsync(p => p.PatientGuid == patient.PatientId && p.IsActive);
-            if (entity == null) return null!;
+        _context.Patients.Update(entity);
+        await _context.SaveChangesAsync();
 
-            // Apply updates from domain patient to persistence entity
-            entity.Name = patient.Name;
-            entity.Mobile = patient.Mobile;
-            entity.Age = patient.Age;
-            entity.Gender = patient.Gender;
-            entity.Concern = patient.Concern;
+        return MapToDomain(entity);
+    }
 
-            _context.Patients.Update(entity);
-            await _context.SaveChangesAsync();
+    private static Patient MapToDomain(InfraEntity entity)
+    {
+        // Map persistence entity to domain entity. Domain requires non-null values.
+        var age = entity.Age ?? 0;
+        var gender = entity.Gender ?? string.Empty;
+        var concern = entity.Concern ?? string.Empty;
 
-            return MapToDomain(entity);
-        }
-
-        private static Patient MapToDomain(InfraEntity entity)
-        {
-            // Map persistence entity to domain entity. Domain requires non-null values.
-            var age = entity.Age ?? 0;
-            var gender = entity.Gender ?? string.Empty;
-            var concern = entity.Concern ?? string.Empty;
-
-            return new Patient(entity.PatientGuid, entity.Name ?? string.Empty, entity.Mobile ?? string.Empty, age, gender, concern);
-        }
+        return new Patient(entity.PatientGuid, entity.Name ?? string.Empty, entity.Mobile ?? string.Empty, age, gender, concern);
     }
 }

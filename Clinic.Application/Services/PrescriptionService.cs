@@ -2,172 +2,171 @@
 using Clinic.Application.Interfaces.Repositories;
 using Clinic.Domain.Entities;
 
-namespace Clinic.Application.Services
+namespace Clinic.Application.Services;
+
+public class PrescriptionService : IPrescriptionService
 {
-    public class PrescriptionService : IPrescriptionService
+    private readonly IPrescriptionRepository _repository;
+
+    public PrescriptionService(IPrescriptionRepository repository)
     {
-        private readonly IPrescriptionRepository _repository;
+        _repository = repository;
+    }
 
-        public PrescriptionService(IPrescriptionRepository repository)
+    public async Task<PrescriptionResponseDto?> GetByVisitGuidAsync(Guid visitGuid)
+    {
+        var prescription = await _repository.GetByVisitGuidAsync(visitGuid);
+        if (prescription == null) return null;
+
+        return new PrescriptionResponseDto
         {
-            _repository = repository;
-        }
+            PrescriptionId = prescription.PrescriptionId,
+            VisitId = prescription.VisitId,
+            Notes = prescription.Notes,
+            CreatedDate = prescription.CreatedDate,
+            NextFollowUpDate = prescription.NextFollowUpDate,
+            IsFinalized = prescription.IsFinalized,
+            FinalizedAt = prescription.FinalizedAt,
+            Medicines = prescription.Medicines
+                .Select(m => new PrescriptionMedicineDto
+                {
+                    MedicineId = m.MedicineId,
+                    MedicineName = m.MedicineName,
+                    Dosage = m.Dosage,
+                    Frequency = m.Frequency,
+                    Instructions = m.Instructions,
+                    DurationDays = m.DurationDays
+                }).ToList(),
+            Therapies = prescription.Therapies
+                .Select(t => new PrescriptionTherapyDto
+                {
+                    TherapyId = t.TherapyId,
+                    Sessions = t.Sessions,
+                    Notes = t.Notes
+                }).ToList()
+        };
+    }
 
-        public async Task<PrescriptionResponseDto?> GetByVisitGuidAsync(Guid visitGuid)
+    public async Task<Guid> CreateAsync(CreatePrescriptionRequest request)
+    {
+        var prescription = new Prescription(
+            request.VisitId,
+            request.Notes,
+            request.NextFollowUpDate);
+
+        foreach (var med in request.Medicines)
         {
-            var prescription = await _repository.GetByVisitGuidAsync(visitGuid);
-            if (prescription == null) return null;
-
-            return new PrescriptionResponseDto
-            {
-                PrescriptionId = prescription.PrescriptionId,
-                VisitId = prescription.VisitId,
-                Notes = prescription.Notes,
-                CreatedDate = prescription.CreatedDate,
-                NextFollowUpDate = prescription.NextFollowUpDate,
-                IsFinalized = prescription.IsFinalized,
-                FinalizedAt = prescription.FinalizedAt,
-                Medicines = prescription.Medicines
-                    .Select(m => new PrescriptionMedicineDto
-                    {
-                        MedicineId = m.MedicineId,
-                        MedicineName = m.MedicineName,
-                        Dosage = m.Dosage,
-                        Frequency = m.Frequency,
-                        Instructions = m.Instructions,
-                        DurationDays = m.DurationDays
-                    }).ToList(),
-                Therapies = prescription.Therapies
-                    .Select(t => new PrescriptionTherapyDto
-                    {
-                        TherapyId = t.TherapyId,
-                        Sessions = t.Sessions,
-                        Notes = t.Notes
-                    }).ToList()
-            };
-        }
-
-        public async Task<Guid> CreateAsync(CreatePrescriptionRequest request)
-        {
-            var prescription = new Prescription(
-                request.VisitId,
-                request.Notes,
-                request.NextFollowUpDate);
-
-            foreach (var med in request.Medicines)
-            {
-                prescription.AddMedicine(
-                    new PrescriptionMedicine(
-                        prescription.PrescriptionId,
-                        med.MedicineId,
-                        med.MedicineName,
-                        med.Dosage,
-                        med.Frequency,
-                        med.Instructions,
-                        med.DurationDays));
-            }
-
-            foreach (var therapy in request.Therapies)
-            {
-                prescription.AddTherapy(
-                    new PrescriptionTherapy(
-                        prescription.PrescriptionId,
-                        therapy.TherapyId,
-                        therapy.Sessions,
-                        therapy.Notes));
-            }
-
-            return await _repository.CreateAsync(prescription);
-        }
-
-        public async Task<PrescriptionResponseDto?> GetAsync(Guid prescriptionGuid)
-        {
-            var prescription = await _repository.GetByGuidAsync(prescriptionGuid);
-            if (prescription == null) return null;
-
-            return new PrescriptionResponseDto
-            {
-                PrescriptionId = prescription.PrescriptionId,
-                VisitId = prescription.VisitId,
-                Notes = prescription.Notes,
-                CreatedDate = prescription.CreatedDate,
-                NextFollowUpDate = prescription.NextFollowUpDate,
-                IsFinalized = prescription.IsFinalized,
-                FinalizedAt = prescription.FinalizedAt,
-                Medicines = prescription.Medicines
-                    .Select(m => new PrescriptionMedicineDto
-                    {
-                        MedicineName = m.MedicineName,
-                        Dosage = m.Dosage,
-                        Frequency = m.Frequency,
-                        Instructions = m.Instructions,
-                        DurationDays = m.DurationDays
-                    }).ToList(),
-                Therapies = prescription.Therapies
-                    .Select(t => new PrescriptionTherapyDto
-                    {
-                        TherapyId = t.TherapyId,
-                        Sessions = t.Sessions,
-                        Notes = t.Notes
-                    }).ToList()
-            };
-        }
-
-        public async Task UpdateNotesAsync(Guid prescriptionGuid, string? notes)
-        {
-            var prescription = await _repository.GetByGuidAsync(prescriptionGuid);
-            if (prescription == null) return;
-
-            prescription.UpdateNotes(notes);
-            await _repository.UpdateAsync(prescription);
-        }
-
-        public async Task UpdateAsync(Guid prescriptionGuid, UpdatePrescriptionRequest request)
-        {
-            var prescription = await _repository.GetByGuidAsync(prescriptionGuid);
-            if (prescription == null) return;
-
-            // Update top-level fields
-            prescription.UpdateNotes(request.Notes);
-
-            // Clear and re-add medicines/therapies using domain methods
-            // Create a new prescription domain object based on existing so we can replace collections
-            var updated = new Prescription(
-                prescription.PrescriptionId,
-                prescription.VisitId,
-                request.Notes,
-                request.NextFollowUpDate,
-                prescription.CreatedDate,
-                prescription.IsFinalized,
-                prescription.FinalizedAt);
-
-            foreach (var med in request.Medicines ?? new List<PrescriptionMedicineDto>())
-            {
-                updated.AddMedicine(new PrescriptionMedicine(
-                    updated.PrescriptionId,
+            prescription.AddMedicine(
+                new PrescriptionMedicine(
+                    prescription.PrescriptionId,
                     med.MedicineId,
                     med.MedicineName,
                     med.Dosage,
                     med.Frequency,
                     med.Instructions,
-                    med.DurationDays),
-                    skipCheck: true);
-            }
-
-            foreach (var therapy in request.Therapies ?? new List<PrescriptionTherapyDto>())
-            {
-                updated.AddTherapy(new PrescriptionTherapy(
-                    updated.PrescriptionId,
-                    therapy.TherapyId,
-                    therapy.Sessions,
-                    therapy.Notes),
-                    skipCheck: true);
-            }
-
-            await _repository.UpdateAsync(updated);
+                    med.DurationDays));
         }
 
-        public Task AutoFinalizeExpiredAsync()
-            => _repository.AutoFinalizeExpiredAsync();
+        foreach (var therapy in request.Therapies)
+        {
+            prescription.AddTherapy(
+                new PrescriptionTherapy(
+                    prescription.PrescriptionId,
+                    therapy.TherapyId,
+                    therapy.Sessions,
+                    therapy.Notes));
+        }
+
+        return await _repository.CreateAsync(prescription);
     }
+
+    public async Task<PrescriptionResponseDto?> GetAsync(Guid prescriptionGuid)
+    {
+        var prescription = await _repository.GetByGuidAsync(prescriptionGuid);
+        if (prescription == null) return null;
+
+        return new PrescriptionResponseDto
+        {
+            PrescriptionId = prescription.PrescriptionId,
+            VisitId = prescription.VisitId,
+            Notes = prescription.Notes,
+            CreatedDate = prescription.CreatedDate,
+            NextFollowUpDate = prescription.NextFollowUpDate,
+            IsFinalized = prescription.IsFinalized,
+            FinalizedAt = prescription.FinalizedAt,
+            Medicines = prescription.Medicines
+                .Select(m => new PrescriptionMedicineDto
+                {
+                    MedicineName = m.MedicineName,
+                    Dosage = m.Dosage,
+                    Frequency = m.Frequency,
+                    Instructions = m.Instructions,
+                    DurationDays = m.DurationDays
+                }).ToList(),
+            Therapies = prescription.Therapies
+                .Select(t => new PrescriptionTherapyDto
+                {
+                    TherapyId = t.TherapyId,
+                    Sessions = t.Sessions,
+                    Notes = t.Notes
+                }).ToList()
+        };
+    }
+
+    public async Task UpdateNotesAsync(Guid prescriptionGuid, string? notes)
+    {
+        var prescription = await _repository.GetByGuidAsync(prescriptionGuid);
+        if (prescription == null) return;
+
+        prescription.UpdateNotes(notes);
+        await _repository.UpdateAsync(prescription);
+    }
+
+    public async Task UpdateAsync(Guid prescriptionGuid, UpdatePrescriptionRequest request)
+    {
+        var prescription = await _repository.GetByGuidAsync(prescriptionGuid);
+        if (prescription == null) return;
+
+        // Update top-level fields
+        prescription.UpdateNotes(request.Notes);
+
+        // Clear and re-add medicines/therapies using domain methods
+        // Create a new prescription domain object based on existing so we can replace collections
+        var updated = new Prescription(
+            prescription.PrescriptionId,
+            prescription.VisitId,
+            request.Notes,
+            request.NextFollowUpDate,
+            prescription.CreatedDate,
+            prescription.IsFinalized,
+            prescription.FinalizedAt);
+
+        foreach (var med in request.Medicines ?? new List<PrescriptionMedicineDto>())
+        {
+            updated.AddMedicine(new PrescriptionMedicine(
+                updated.PrescriptionId,
+                med.MedicineId,
+                med.MedicineName,
+                med.Dosage,
+                med.Frequency,
+                med.Instructions,
+                med.DurationDays),
+                skipCheck: true);
+        }
+
+        foreach (var therapy in request.Therapies ?? new List<PrescriptionTherapyDto>())
+        {
+            updated.AddTherapy(new PrescriptionTherapy(
+                updated.PrescriptionId,
+                therapy.TherapyId,
+                therapy.Sessions,
+                therapy.Notes),
+                skipCheck: true);
+        }
+
+        await _repository.UpdateAsync(updated);
+    }
+
+    public Task AutoFinalizeExpiredAsync()
+        => _repository.AutoFinalizeExpiredAsync();
 }

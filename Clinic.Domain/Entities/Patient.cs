@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Clinic.Domain.Entities;
+﻿namespace Clinic.Domain.Entities;
 
 public class Patient
 {
-    //public int Id { get; private set; }
     public Guid PatientId { get; set; }
     public string Name { get; private set; }
     public string Mobile { get; private set; }
@@ -35,4 +28,3 @@ public class Patient
         Concern = concern;
     }
 }
-

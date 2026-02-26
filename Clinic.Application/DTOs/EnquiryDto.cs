@@ -1,16 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Clinic.Application.DTOs;
 
-namespace Clinic.Application.DTOs
+public class CreateEnquiryRequest
 {
-    public class CreateEnquiryRequest
-    {
-        public string Name { get; set; }
-        public string Mobile { get; set; }
-        public string Message { get; set; }
-    }
-
+    public string Name { get; set; }
+    public string Mobile { get; set; }
+    public string Message { get; set; }
 }

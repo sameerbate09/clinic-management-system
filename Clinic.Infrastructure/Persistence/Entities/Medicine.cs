@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Clinic.Infrastructure.Persistence.Entities;
+﻿namespace Clinic.Infrastructure.Persistence.Entities;
 
 public partial class Medicine
 {
@@ -13,7 +10,7 @@ public partial class Medicine
 
     public string? Description { get; set; }
 
-    public bool IsActive { get; set; }
+    public bool IsActive { get; set; } = true;
 
     public DateTime CreatedDate { get; set; }
 

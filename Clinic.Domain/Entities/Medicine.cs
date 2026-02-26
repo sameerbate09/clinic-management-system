@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Clinic.Domain.Entities;
+﻿namespace Clinic.Domain.Entities;
 
 public class Medicine
 {
     public Guid MedicineGuid { get; set; }
 
-    public string Name { get; set; } = null!;
+    public string Name { get; set; }
 
     public string? Description { get; set; }
 
@@ -33,6 +27,3 @@ public class Medicine
         MedicineGuid = id;
     }
 }
-
-
-
