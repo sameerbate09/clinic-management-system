@@ -1,9 +1,11 @@
 ﻿using Clinic.Application.DTOs;
 using Clinic.Application.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Clinic.API.Controllers;
 
+[Authorize]
 [Route("api/[controller]")]
 [ApiController]
 public class MedicineController : ControllerBase

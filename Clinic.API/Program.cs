@@ -90,6 +90,14 @@ builder.Services.AddScoped<IPrescriptionRepository, PrescriptionRepository>();
 builder.Services.AddScoped<IPrescriptionService, PrescriptionService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAdminRepository, AdminRepository>();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AngularLocal",
+    policy => policy
+        .WithOrigins("http://localhost:4200") 
+        .AllowAnyHeader()
+        .AllowAnyMethod());
+});
 
 var app = builder.Build();
 
@@ -101,10 +109,12 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseRouting();
+app.UseCors("AngularLocal");
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers();
+
+app.MapControllers().AllowAnonymous();
 
 app.Run();

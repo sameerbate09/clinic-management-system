@@ -1,9 +1,11 @@
 ﻿using Clinic.Application.DTOs;
 using Clinic.Application.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Clinic.API.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/visits")]
 public class VisitsController : ControllerBase
@@ -18,6 +20,9 @@ public class VisitsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(CreateVisitDto dto)
     {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
         var visitId = await _visitService.AddAsync(dto);
         return Ok(new { VisitId = visitId });
     }

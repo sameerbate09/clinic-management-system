@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Clinic.API.Controllers;
 
-
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class PatientController : ControllerBase
@@ -17,7 +17,6 @@ public class PatientController : ControllerBase
         _service = service;
     }
 
-    //[Authorize]
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {

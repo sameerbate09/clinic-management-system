@@ -1,9 +1,11 @@
 ﻿using Clinic.Application.DTOs;
 using Clinic.Application.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Clinic.API.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class PrescriptionController : ControllerBase
@@ -18,6 +20,9 @@ public class PrescriptionController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(CreatePrescriptionRequest request)
     {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
         var id = await _service.CreateAsync(request);
         return Ok(id);
     }
@@ -43,6 +48,9 @@ public class PrescriptionController : ControllerBase
     [HttpPut("{guid}")]
     public async Task<IActionResult> UpdatePrescription(Guid guid, [FromBody] UpdatePrescriptionRequest request)
     {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
         await _service.UpdateAsync(guid, request);
         return NoContent();
     }
