@@ -111,6 +111,13 @@ public class PatientRepository : IPatientRepository
         return MapToDomain(entity);
     }
 
+    public async Task<int> GetTotalCountAsync()
+    {
+        int TotalPatients = await _context.Patients.CountAsync();
+        return TotalPatients;
+
+    }
+
     private static Patient MapToDomain(InfraEntity entity)
     {
         // Map persistence entity to domain entity. Domain requires non-null values.

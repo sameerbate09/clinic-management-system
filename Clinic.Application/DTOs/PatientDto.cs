@@ -18,4 +18,6 @@ public class PatientResponse
     public Guid PatientId { get; set; }
     public string Name { get; set; }
     public string Mobile { get; set; }
+    public int Age { get; set; }
+    public string Gender { get; set; }
 }

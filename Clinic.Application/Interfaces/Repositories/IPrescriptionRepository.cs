@@ -1,4 +1,5 @@
-﻿using Clinic.Domain.Entities;
+﻿using Clinic.Application.DTOs;
+using Clinic.Domain.Entities;
 
 namespace Clinic.Application.Interfaces.Repositories;
 
@@ -8,5 +9,6 @@ public interface IPrescriptionRepository
     Task<Prescription?> GetByGuidAsync(Guid prescriptionGuid);
     Task<Prescription?> GetByVisitGuidAsync(Guid visitGuid);
     Task UpdateAsync(Prescription prescription);
+    Task<List<FollowUpDetailsDto>> GetTodaysFollowUpsAsync(DateTime date);
     Task AutoFinalizeExpiredAsync();
 }

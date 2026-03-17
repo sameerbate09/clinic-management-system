@@ -15,7 +15,7 @@ public partial class Patient
 
     public string? Concern { get; set; }
 
-    public bool IsActive { get; set; }
+    public bool IsActive { get; set; } = true;
 
     public DateTime CreatedDate { get; set; }
 

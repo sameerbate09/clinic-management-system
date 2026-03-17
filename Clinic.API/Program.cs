@@ -90,6 +90,7 @@ builder.Services.AddScoped<IPrescriptionRepository, PrescriptionRepository>();
 builder.Services.AddScoped<IPrescriptionService, PrescriptionService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAdminRepository, AdminRepository>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AngularLocal",

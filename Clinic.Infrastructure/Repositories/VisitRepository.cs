@@ -1,4 +1,5 @@
-﻿using Clinic.Application.Interfaces.Repositories;
+﻿using Clinic.Application.DTOs;
+using Clinic.Application.Interfaces.Repositories;
 using Clinic.Domain.Entities;
 using Clinic.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -60,6 +61,26 @@ public class VisitRepository : IVisitRepository
             .ToListAsync();
 
         return list.Select(MapToDomain).ToList();
+    }
+
+    public async Task<int> GetVisitsCountByDateAsync(DateTime date)
+    {
+        return await _context.Visits
+        .CountAsync(v => v.VisitDate.Date == date.Date);
+    }
+
+    public async Task<List<RecentVisitDto>> GetRecentVisitsAsync(int count)
+    {
+        return await _context.Visits
+            .OrderByDescending(v => v.VisitDate)
+            .Take(count)
+            .Select(v => new RecentVisitDto
+            {
+                PatientName = v.Patient.Name,
+                VisitDate = v.VisitDate,
+                Complaint = v.Notes 
+            })
+            .ToListAsync();
     }
 
     private static Visit MapToDomain(InfraEntity entity)

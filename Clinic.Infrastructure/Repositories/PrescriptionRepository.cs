@@ -1,4 +1,5 @@
-﻿using Clinic.Application.Interfaces.Repositories;
+﻿using Clinic.Application.DTOs;
+using Clinic.Application.Interfaces.Repositories;
 using Clinic.Domain.Entities;
 using Clinic.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -229,6 +230,19 @@ public class PrescriptionRepository : IPrescriptionRepository
         }
 
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<List<FollowUpDetailsDto>> GetTodaysFollowUpsAsync(DateTime date)
+    {
+        return await _context.Prescriptions
+            .Where(p => p.NextFollowUpDate.HasValue && p.NextFollowUpDate.Value.Date == date.Date)
+            .Select(p => new FollowUpDetailsDto
+            {
+                PatientName = p.Visit.Patient.Name,
+                FollowUpDate = p.NextFollowUpDate,
+                Concern = p.Notes // or whatever field stores the "Concern"
+            })
+            .ToListAsync();
     }
 
     private Prescription MapToDomain(Infrastructure.Persistence.Entities.Prescription entity)
