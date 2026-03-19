@@ -12,6 +12,8 @@ public partial class ClinicDbContext : DbContext
     {
     }
 
+    public virtual DbSet<Address> Addresses { get; set; }
+
     public virtual DbSet<Admin> Admins { get; set; }
 
     public virtual DbSet<Enquiry> Enquiries { get; set; }
@@ -32,6 +34,25 @@ public partial class ClinicDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Address>(entity =>
+        {
+            entity.HasKey(e => e.AddressId).HasName("PK__Address__091C2AFB725138D4");
+
+            entity.ToTable("Address");
+
+            entity.HasIndex(e => e.PatientGuid, "UQ_Address_Patient").IsUnique();
+
+            entity.Property(e => e.AddressId).HasDefaultValueSql("(newid())");
+            entity.Property(e => e.City).HasMaxLength(100);
+            entity.Property(e => e.Pincode).HasMaxLength(10);
+            entity.Property(e => e.Street).HasMaxLength(200);
+
+            entity.HasOne(d => d.Patient).WithOne(p => p.Address)
+                .HasForeignKey<Address>(d => d.PatientGuid)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Address_Patient");
+        });
+
         modelBuilder.Entity<Admin>(entity =>
         {
             entity.HasKey(e => e.AdminId).HasName("PK__Admins__719FE488A53CB03A");
@@ -79,6 +100,9 @@ public partial class ClinicDbContext : DbContext
             entity.HasIndex(e => e.Mobile, "UQ__Patients__6FAE078238AE7ED7").IsUnique();
 
             entity.Property(e => e.PatientGuid).HasDefaultValueSql("(newid())");
+            entity.Property(e => e.BloodGroup)
+                .HasMaxLength(20)
+                .IsUnicode(false);
             entity.Property(e => e.Concern).HasMaxLength(50);
             entity.Property(e => e.CreatedDate)
                 .HasDefaultValueSql("(getdate())")

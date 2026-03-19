@@ -2,7 +2,7 @@
 using Clinic.Domain.Entities;
 using Clinic.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using InfraEntity = Clinic.Infrastructure.Persistence.Entities.Patient;
+using InfraEntity = Clinic.Infrastructure.Persistence.Entities;
 
 namespace Clinic.Infrastructure.Repositories;
 
@@ -21,16 +21,27 @@ public class PatientRepository : IPatientRepository
             throw new ArgumentNullException(nameof(patient), "Patient cannot be null");
 
         // Map domain Patient to persistence entity
-        var entity = new InfraEntity
+        var entity = new InfraEntity.Patient
         {
             Name = patient.Name,
             Mobile = patient.Mobile,
             Age = patient.Age,
             Gender = patient.Gender,
             Concern = patient.Concern,
+            BloodGroup = patient.BloodGroup,
             // IsActive and CreatedDate are configured with defaults in the DbContext model;
             // leave them unset so the database defaults are applied.
         };
+        if (patient.Address != null)
+        {
+            entity.Address = new InfraEntity.Address
+            {
+                AddressId = Guid.NewGuid(),
+                Street = patient.Address.Street,
+                City = patient.Address.City,
+                Pincode = patient.Address.Pincode
+            };
+        }
 
         await _context.Patients.AddAsync(entity);
         await _context.SaveChangesAsync();
@@ -82,6 +93,7 @@ public class PatientRepository : IPatientRepository
         var normalizedMobile = mobile.Trim();
 
         var entity = await _context.Patients
+            .Include(p => p.Address)
             .AsNoTracking()
             .FirstOrDefaultAsync(p => p.Mobile == normalizedMobile && p.IsActive);
 
@@ -95,7 +107,10 @@ public class PatientRepository : IPatientRepository
     {
         if (patient == null) throw new ArgumentNullException(nameof(patient));
 
-        var entity = await _context.Patients.FirstOrDefaultAsync(p => p.PatientGuid == patient.PatientId && p.IsActive);
+        var entity = await _context.Patients
+            .Include(p => p.Address)
+            .FirstOrDefaultAsync(p => p.PatientGuid == patient.PatientId && p.IsActive);
+        
         if (entity == null) return null!;
 
         // Apply updates from domain patient to persistence entity
@@ -104,6 +119,29 @@ public class PatientRepository : IPatientRepository
         entity.Age = patient.Age;
         entity.Gender = patient.Gender;
         entity.Concern = patient.Concern;
+        entity.BloodGroup = patient.BloodGroup;
+
+        if (patient.Address != null)
+        {
+            if (entity.Address != null)
+            {
+                // Update existing address
+                entity.Address.Street = patient.Address.Street;
+                entity.Address.City = patient.Address.City;
+                entity.Address.Pincode = patient.Address.Pincode;
+            }
+            else
+            {
+                // Create new address
+                entity.Address = new InfraEntity.Address
+                {
+                    AddressId = Guid.NewGuid(),
+                    Street = patient.Address.Street,
+                    City = patient.Address.City,
+                    Pincode = patient.Address.Pincode
+                };
+            }
+        }
 
         _context.Patients.Update(entity);
         await _context.SaveChangesAsync();
@@ -118,13 +156,25 @@ public class PatientRepository : IPatientRepository
 
     }
 
-    private static Patient MapToDomain(InfraEntity entity)
+    private static Patient MapToDomain(InfraEntity.Patient entity)
     {
         // Map persistence entity to domain entity. Domain requires non-null values.
         var age = entity.Age ?? 0;
         var gender = entity.Gender ?? string.Empty;
         var concern = entity.Concern ?? string.Empty;
+        var bloodGroup = entity.BloodGroup ?? string.Empty;
 
-        return new Patient(entity.PatientGuid, entity.Name ?? string.Empty, entity.Mobile ?? string.Empty, age, gender, concern);
+        Address? address = null;
+
+        if (entity.Address != null)
+        {
+            address = new Address(
+                entity.Address.Street ?? string.Empty,
+                entity.Address.City ?? string.Empty,
+                entity.Address.Pincode ?? string.Empty
+            );
+        }
+
+        return new Patient(entity.PatientGuid, entity.Name ?? string.Empty, entity.Mobile ?? string.Empty, age, gender, concern, bloodGroup, address);
     }
 }

@@ -21,5 +21,9 @@ public partial class Patient
 
     public Guid PatientGuid { get; set; }
 
+    public string? BloodGroup { get; set; }
+
+    public virtual Address? Address { get; set; }
+
     public virtual ICollection<Visit> Visits { get; set; } = new List<Visit>();
 }

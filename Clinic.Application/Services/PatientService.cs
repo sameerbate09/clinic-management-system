@@ -15,7 +15,13 @@ public class PatientService : IPatientService
 
     public async Task<PatientResponse?> CreateAsync(CreatePatientRequest request)
     {
-        var domain = new Patient(request.Name, request.Mobile, request.Age, request.Gender, request.Concern);
+        var address = new Address(
+        request.Address.Street,
+        request.Address.City,
+        request.Address.Pincode
+        );
+
+        var domain = new Patient(request.Name, request.Mobile, request.Age, request.Gender, request.Concern, request.BloodGroup, address);
         await _repository.AddAsync(domain);
 
         // Try to fetch by mobile to return created entity with Id
@@ -56,7 +62,18 @@ public class PatientService : IPatientService
         var existing = await _repository.GetByIdAsync(id);
         if (existing == null) return null;
 
-        var updatedDomain = new Patient(id, request.Name, request.Mobile, request.Age, request.Gender, request.Concern);
+        Address? address = null;
+
+        if (request.Address != null)
+        {
+            address = new Address(
+                request.Address.Street,
+                request.Address.City,
+                request.Address.Pincode
+            );
+        }
+
+        var updatedDomain = new Patient(id, request.Name, request.Mobile, request.Age, request.Gender, request.Concern, request.BloodGroup, address);
         var updated = await _repository.UpdatePatient(updatedDomain);
         if (updated == null) return null;
 

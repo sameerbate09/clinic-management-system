@@ -11,6 +11,10 @@ public class CreatePatientRequest
     public string Gender { get; set; }
 
     public string Concern { get; set; }
+
+    public string BloodGroup { get; set; }
+
+    public AddressDto Address { get; set; }
 }
 
 public class PatientResponse
