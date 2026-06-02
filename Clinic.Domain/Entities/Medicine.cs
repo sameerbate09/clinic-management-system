@@ -3,7 +3,7 @@
 public class Medicine
 {
     public Guid MedicineGuid { get; set; }
-
+    public int MedicineId { get; set; }
     public string Name { get; set; }
 
     public string? Description { get; set; }
@@ -14,6 +14,18 @@ public class Medicine
         Name = name;
         Description = desc;
 
+    }
+
+    public Medicine(
+    int medicineId,
+    Guid medicineGuid,
+    string name,
+    string? description)
+    {
+        MedicineId = medicineId;
+        MedicineGuid = medicineGuid;
+        Name = name;
+        Description = description;
     }
 
     public Medicine(string name, string desc)

@@ -33,7 +33,7 @@ public class MedicineService : IMedicineService
     public async Task<List<MedicineResponse>> GetAllAsync()
     {
         var list = await _medicineRepository.GetAllAsync();
-        return list.Select(m => new MedicineResponse { MedicineGuid = m.MedicineGuid, Name = m.Name, Description = m.Description }).ToList();
+        return list.Select(m => new MedicineResponse { MedicineId = m.MedicineId, MedicineGuid = m.MedicineGuid, Name = m.Name, Description = m.Description }).ToList();
     }
 
     public async Task UpdateAsync(Guid medicineGuid, MedicineUpdateRequest request)

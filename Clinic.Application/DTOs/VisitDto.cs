@@ -10,6 +10,7 @@ public class CreateVisitDto
 public class VisitResponseDto
 {
     public Guid VisitId { get; set; }
+    public Guid PatientGuid { get; set; }
     public DateTime VisitDate { get; set; }
     public string Complaint { get; set; }
     public string Notes { get; set; }

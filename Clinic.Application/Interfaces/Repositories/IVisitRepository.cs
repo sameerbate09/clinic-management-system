@@ -7,7 +7,7 @@ public interface IVisitRepository
 {
     Task<IEnumerable<Visit>> GetByPatientIdAsync(Guid patientId);
     Task<Visit> GetByIdAsync(Guid visitId);
-    Task<Guid> AddAsync(Visit visit);
+    Task<VisitResponseDto> AddAsync(Visit visit);
     Task<int> GetVisitsCountByDateAsync(DateTime date);
     Task<List<RecentVisitDto>> GetRecentVisitsAsync(int count);
     Task<List<RecentVisitDto>> GetAllVisitsAsync();

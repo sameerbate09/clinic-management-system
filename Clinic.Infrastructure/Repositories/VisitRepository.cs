@@ -16,7 +16,7 @@ public class VisitRepository : IVisitRepository
         _context = context;
     }
 
-    public async Task<Guid> AddAsync(Visit visit)
+    public async Task<VisitResponseDto> AddAsync(Visit visit)
     {
         var patientExists = await _context.Patients
             .AnyAsync(p => p.PatientGuid == visit.PatientId);
@@ -36,7 +36,14 @@ public class VisitRepository : IVisitRepository
         await _context.Visits.AddAsync(entity);
         await _context.SaveChangesAsync();
 
-        return entity.VisitGuid;
+        return new VisitResponseDto
+        {
+            VisitId = entity.VisitGuid,
+            PatientGuid = entity.PatientGuid,
+            VisitDate = entity.VisitDate,
+            Complaint = entity.Complaint,
+            Notes = entity.Notes
+        };
     }
 
 

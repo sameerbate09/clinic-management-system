@@ -8,6 +8,7 @@ public class CreateMedicineRequest
 
 public class MedicineResponse
 {
+    public int MedicineId { get; set; }
     public Guid MedicineGuid { get; set; }
     public string Name { get; set; } = null!;
     public string? Description { get; set; }

@@ -12,16 +12,16 @@ public class VisitService : IVisitService
     {
         _visitRepository = visitRepository;
     }
-    public async Task<Guid> AddAsync(CreateVisitDto dto)
+    public async Task<VisitResponseDto> AddAsync(CreateVisitDto dto)
     {
         var visit = new Visit(
        dto.PatientId,
        DateTime.UtcNow,
        dto.Complaint,
        dto.Notes
-   );
+       );
 
-        return await _visitRepository.AddAsync(visit);
+       return await _visitRepository.AddAsync(visit); ;
     }
 
     public async Task<VisitResponseDto?> GetByIdAsync(Guid visitId)

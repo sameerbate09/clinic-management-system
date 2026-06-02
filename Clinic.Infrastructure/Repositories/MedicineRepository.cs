@@ -108,6 +108,6 @@ public class MedicineRepository : IMedicineRepository
     {
         if (entity == null) throw new ArgumentNullException(nameof(entity));
 
-        return new Medicine(entity.MedicineGuid, entity.Name, entity.Description);
+        return new Medicine(entity.MedicineId, entity.MedicineGuid, entity.Name, entity.Description);
     }
 }
