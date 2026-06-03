@@ -31,7 +31,6 @@ public class PrescriptionService : IPrescriptionService
                 .Select(m => new PrescriptionMedicineDto
                 {
                     MedicineId = m.MedicineId,
-                    MedicineName = m.MedicineName,
                     Dosage = m.Dosage,
                     Frequency = m.Frequency,
                     Instructions = m.Instructions,
@@ -60,7 +59,6 @@ public class PrescriptionService : IPrescriptionService
                 new PrescriptionMedicine(
                     prescription.PrescriptionId,
                     med.MedicineId,
-                    med.MedicineName,
                     med.Dosage,
                     med.Frequency,
                     med.Instructions,
@@ -97,7 +95,7 @@ public class PrescriptionService : IPrescriptionService
             Medicines = prescription.Medicines
                 .Select(m => new PrescriptionMedicineDto
                 {
-                    MedicineName = m.MedicineName,
+                    MedicineId = m.MedicineId,
                     Dosage = m.Dosage,
                     Frequency = m.Frequency,
                     Instructions = m.Instructions,
@@ -146,7 +144,6 @@ public class PrescriptionService : IPrescriptionService
             updated.AddMedicine(new PrescriptionMedicine(
                 updated.PrescriptionId,
                 med.MedicineId,
-                med.MedicineName,
                 med.Dosage,
                 med.Frequency,
                 med.Instructions,

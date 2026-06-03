@@ -149,7 +149,6 @@ public partial class ClinicDbContext : DbContext
             entity.Property(e => e.Duration).HasMaxLength(50);
             entity.Property(e => e.Frequency).HasMaxLength(50);
             entity.Property(e => e.Instructions).HasMaxLength(250);
-            entity.Property(e => e.MedicineName).HasMaxLength(150);
 
             entity.HasOne(d => d.Medicine).WithMany(p => p.PrescriptionMedicines)
                 .HasForeignKey(d => d.MedicineId)

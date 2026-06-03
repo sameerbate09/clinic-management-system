@@ -44,6 +44,7 @@ public class VisitService : IVisitService
         // Map to AllVisitDto
         return list.Select(v => new RecentVisitDto
         {
+            VisitGuid = v.VisitGuid,
             PatientName = v.PatientName,
             Complaint = v.Complaint,
             VisitDate = v.VisitDate

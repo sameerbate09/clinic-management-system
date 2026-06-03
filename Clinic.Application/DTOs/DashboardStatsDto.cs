@@ -17,6 +17,7 @@
 
     public class RecentVisitDto
     {
+        public Guid VisitGuid { get; set; }
         public string PatientName { get; set; }
         public DateTime VisitDate { get; set; }
         public string Complaint { get; set; }

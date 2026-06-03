@@ -85,7 +85,7 @@ public class VisitRepository : IVisitRepository
             {
                 PatientName = v.Patient.Name,
                 VisitDate = v.VisitDate,
-                Complaint = v.Notes 
+                Complaint = v.Complaint 
             })
             .ToListAsync();
     }
@@ -96,6 +96,7 @@ public class VisitRepository : IVisitRepository
             .OrderByDescending(v => v.VisitDate)
             .Select(v => new RecentVisitDto
             {
+                VisitGuid = v.VisitGuid,
                 PatientName = v.Patient.Name,
                 VisitDate = v.VisitDate,
                 Complaint = v.Complaint ?? v.Notes ?? string.Empty

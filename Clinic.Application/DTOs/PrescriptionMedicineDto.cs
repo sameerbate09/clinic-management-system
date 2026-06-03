@@ -3,7 +3,7 @@
 public class PrescriptionMedicineDto
 {
     public int MedicineId { get; set; }
-    public string? MedicineName { get; set; }
+    // MedicineName removed; consumers should resolve name from Medicine service if needed
     public string Dosage { get; set; }
     public string Frequency { get; set; }
     public string Instructions { get; set; }

@@ -44,27 +44,15 @@ public class PrescriptionRepository : IPrescriptionRepository
 
             if (med.MedicineId > 0)
             {
-                // If caller provided an existing medicine id, use that medicine and
-                // take the canonical name from DB. Do not create a new medicine.
+                // If caller provided an existing medicine id, use that medicine.
                 medicineEntity = await _context.Medicines.FindAsync(med.MedicineId);
                 if (medicineEntity == null)
                     throw new InvalidOperationException($"Medicine with id {med.MedicineId} not found.");
             }
             else
             {
-                medicineEntity = await _context.Medicines.FirstOrDefaultAsync(m => m.Name == med.MedicineName);
-                if (medicineEntity == null)
-                {
-                    medicineEntity = new Infrastructure.Persistence.Entities.Medicine
-                    {
-                        MedicineGuid = Guid.NewGuid(),
-                        Name = med.MedicineName
-                    };
-
-                    await _context.Medicines.AddAsync(medicineEntity);
-                    // Save to obtain the generated MedicineId
-                    await _context.SaveChangesAsync();
-                }
+                // MedicineName has been removed from the DTO/domain. Require caller to supply MedicineId.
+                throw new InvalidOperationException("MedicineId must be provided when MedicineName is not supplied.");
             }
 
             _context.PrescriptionMedicines.Add(new Infrastructure.Persistence.Entities.PrescriptionMedicine
@@ -72,8 +60,7 @@ public class PrescriptionRepository : IPrescriptionRepository
                 PrescriptionId = entity.PrescriptionId,
                 PrescriptionGuid = entity.PrescriptionGuid,
                 MedicineId = medicineEntity.MedicineId,
-                // Always store the medicine name from the resolved Medicine entity.
-                MedicineName = medicineEntity.Name,
+                // MedicineName removed: rely on navigation property Medicine.Name
                 Dosage = med.Dosage,
                 Frequency = med.Frequency,
                 Instructions = med.Instructions,
@@ -107,6 +94,7 @@ public class PrescriptionRepository : IPrescriptionRepository
     {
         var entity = await _context.Prescriptions
             .Include(p => p.PrescriptionMedicinePrescriptions)
+                .ThenInclude(pm => pm.Medicine)
             .Include(p => p.PrescriptionTherapyPrescriptions)
             .FirstOrDefaultAsync(p => p.PrescriptionGuid == prescriptionGuid);
 
@@ -119,6 +107,7 @@ public class PrescriptionRepository : IPrescriptionRepository
     {
         var entity = await _context.Prescriptions
             .Include(p => p.PrescriptionMedicinePrescriptions)
+                .ThenInclude(pm => pm.Medicine)
             .Include(p => p.PrescriptionTherapyPrescriptions)
             .FirstOrDefaultAsync(p => p.VisitGuid == visitGuid);
 
@@ -160,18 +149,8 @@ public class PrescriptionRepository : IPrescriptionRepository
             }
             else
             {
-                medicineEntity = await _context.Medicines.FirstOrDefaultAsync(m => m.Name == med.MedicineName);
-                if (medicineEntity == null)
-                {
-                    medicineEntity = new Infrastructure.Persistence.Entities.Medicine
-                    {
-                        MedicineGuid = Guid.NewGuid(),
-                        Name = med.MedicineName
-                    };
-
-                    await _context.Medicines.AddAsync(medicineEntity);
-                    await _context.SaveChangesAsync();
-                }
+                // MedicineName removed; require MedicineId from caller
+                throw new InvalidOperationException("MedicineId must be provided when MedicineName is not supplied.");
             }
 
             _context.PrescriptionMedicines.Add(new Infrastructure.Persistence.Entities.PrescriptionMedicine
@@ -179,7 +158,6 @@ public class PrescriptionRepository : IPrescriptionRepository
                 PrescriptionId = entity.PrescriptionId,
                 PrescriptionGuid = entity.PrescriptionGuid,
                 MedicineId = medicineEntity.MedicineId,
-                MedicineName = medicineEntity.Name,
                 Dosage = med.Dosage,
                 Frequency = med.Frequency,
                 Instructions = med.Instructions,
@@ -263,8 +241,7 @@ public class PrescriptionRepository : IPrescriptionRepository
             // therapies to the domain object without those checks so GET operations don't throw.
             domain.AddMedicine(new PrescriptionMedicine(
                 domain.PrescriptionId,
-                med.MedicineId, 
-                med.MedicineName,
+                med.MedicineId,
                 med.Dosage,
                 med.Frequency,
                 med.Instructions,

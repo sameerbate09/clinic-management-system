@@ -48,6 +48,7 @@ public class VisitsController : ControllerBase
         var visits = await _visitService.GetAllVisitsAsync();
         return Ok(visits.Select(v => new
         {
+            v.VisitGuid,
             v.PatientName,
             v.Complaint,
             v.VisitDate
